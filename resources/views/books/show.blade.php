@@ -11,13 +11,44 @@
                 </button>
             </form>
         </div>
-        <p class="text-sm mb-8" style="color: var(--ink-soft);">
-            {{ $book->author }}
-            @if ($book->year_published) · {{ __('published') }} {{ $book->year_published }} @endif
-            @if ($book->year_read)
-                · {{ __('read') }} {{ $book->month_read ? \Carbon\Carbon::create()->month($book->month_read)->format('F') : '' }} {{ $book->year_read }}
-            @endif
-        </p>
+
+        <div class="bk-card" x-data="{ editing: false }">
+            <template x-if="!editing">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-sm" style="color: var(--ink-soft);">
+                        {{ $book->author }}
+                        @if ($book->year_published) · {{ __('published') }} {{ $book->year_published }} @endif
+                        @if ($book->year_read)
+                            · {{ __('read') }} {{ $book->month_read ? \Carbon\Carbon::create()->month($book->month_read)->format('F') : '' }} {{ $book->year_read }}
+                        @endif
+                    </p>
+                    <button type="button" @click="editing = true" class="text-xs underline shrink-0" style="color: var(--ink-soft);">{{ __('Edit') }}</button>
+                </div>
+            </template>
+            <template x-if="editing">
+                <form method="POST" action="{{ route('books.update', $book) }}" class="space-y-2">
+                    @csrf
+                    @method('PATCH')
+                    <input type="text" name="title" value="{{ $book->title }}" required maxlength="255" placeholder="{{ __('Title') }}" class="bk-input">
+                    <input type="text" name="author" value="{{ $book->author }}" required maxlength="255" placeholder="{{ __('Author') }}" class="bk-input">
+                    <div class="flex gap-2">
+                        <input type="number" name="year_published" value="{{ $book->year_published }}" placeholder="{{ __('Year published') }}" class="bk-input">
+                        <input type="number" name="year_read" value="{{ $book->year_read }}" placeholder="{{ __('Year read') }}" class="bk-input">
+                        <select name="month_read" class="bk-input">
+                            <option value="">{{ __('Month read') }}</option>
+                            @foreach (range(1, 12) as $m)
+                                <option value="{{ $m }}" {{ $book->month_read == $m ? 'selected' : '' }}>{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <button type="button" @click="editing = false" class="bk-btn bk-btn-ghost">{{ __('Cancel') }}</button>
+                        <button type="submit" class="bk-btn bk-btn-solid">{{ __('Save') }}</button>
+                    </div>
+                </form>
+            </template>
+        </div>
+
 
         <form method="POST" action="{{ route('quotes.store', $book) }}" class="bk-card" x-data="{ open: false }">
             @csrf
