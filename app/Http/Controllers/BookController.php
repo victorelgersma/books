@@ -48,15 +48,18 @@ class BookController extends Controller
                                     return redirect()->route('books.index');
                                 }
 
-        protected function validated(Request $request): array
-                {
-                            return $request->validate([
-                                            'title' => ['required', 'string', 'max:255'],
-                                                        'author' => ['required', 'string', 'max:255'],
-                                                                    'year_published' => ['nullable', 'integer', 'min:1000', 'max:2100'],
-                                                                                'year_read' => ['nullable', 'integer', 'min:1000', 'max:2100'],
-                                                                                            'month_read' => ['nullable', 'integer', 'min:1', 'max:12'],
-                                                                                                    ]);
-                                }
+
+protected function validated(Request $request): array
+{
+    return $request->validate([
+        'title' => ['required', 'string', 'max:255'],
+        'author' => ['required', 'string', 'max:255'],
+        'url' => ['nullable', 'url', 'max:2048'],
+        'year_published' => ['nullable', 'integer', 'min:1000', 'max:2100'],
+        'year_read' => ['nullable', 'integer', 'min:1000', 'max:2100'],
+        'month_read' => ['nullable', 'integer', 'min:1', 'max:12'],
+    ]);
+}
+
     }
 

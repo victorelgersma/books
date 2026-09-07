@@ -11,7 +11,7 @@ class Book extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'author', 'year_published', 'year_read', 'month_read',
+        'title', 'author', 'url', 'year_published', 'year_read', 'month_read',
     ];
 
     public function quotes(): HasMany

@@ -15,11 +15,15 @@
         <div class="bk-card" x-data="{ editing: false }">
             <template x-if="!editing">
                 <div class="flex items-center justify-between gap-2">
+
                     <p class="text-sm" style="color: var(--ink-soft);">
                         {{ $book->author }}
                         @if ($book->year_published) · {{ __('published') }} {{ $book->year_published }} @endif
                         @if ($book->year_read)
                             · {{ __('read') }} {{ $book->month_read ? \Carbon\Carbon::create()->month($book->month_read)->format('F') : '' }} {{ $book->year_read }}
+                        @endif
+                        @if ($book->url)
+                            · <a href="{{ $book->url }}" target="_blank" rel="noopener" class="underline">{{ __('Link') }}</a>
                         @endif
                     </p>
                     <button type="button" @click="editing = true" class="text-xs underline shrink-0" style="color: var(--ink-soft);">{{ __('Edit') }}</button>
@@ -31,6 +35,9 @@
                     @method('PATCH')
                     <input type="text" name="title" value="{{ $book->title }}" required maxlength="255" placeholder="{{ __('Title') }}" class="bk-input">
                     <input type="text" name="author" value="{{ $book->author }}" required maxlength="255" placeholder="{{ __('Author') }}" class="bk-input">
+
+
+                    <input type="url" name="url" value="{{ $book->url }}" maxlength="2048" placeholder="{{ __('Link (optional) — Goodreads, publisher page, etc.') }}" class="bk-input">
                     <div class="flex gap-2">
                         <input type="number" name="year_published" value="{{ $book->year_published }}" placeholder="{{ __('Year published') }}" class="bk-input">
                         <input type="number" name="year_read" value="{{ $book->year_read }}" placeholder="{{ __('Year read') }}" class="bk-input">

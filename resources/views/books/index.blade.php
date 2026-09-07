@@ -11,6 +11,8 @@
                 <div class="space-y-2">
                     <input type="text" name="title" required maxlength="255" placeholder="{{ __('Title') }}" class="bk-input">
                     <input type="text" name="author" required maxlength="255" placeholder="{{ __('Author') }}" class="bk-input">
+
+                    <input type="url" name="url" maxlength="2048" placeholder="{{ __('Link (optional) — Goodreads, publisher page, etc.') }}" class="bk-input">
                     <div class="flex gap-2">
                         <input type="number" name="year_published" placeholder="{{ __('Year published') }}" class="bk-input">
                         <input type="number" name="year_read" placeholder="{{ __('Year read') }}" class="bk-input">
@@ -42,6 +44,9 @@
                 <div class="text-sm" style="color: var(--ink-soft);">
                     {{ $book->author }}
                     @if ($book->year_published) · {{ $book->year_published }} @endif
+                    @if ($book->url)
+                        · <a href="{{ $book->url }}" target="_blank" rel="noopener" class="underline" onclick="event.stopPropagation()">{{ __('Link') }}</a>
+                    @endif
                 </div>
             </a>
         @empty
