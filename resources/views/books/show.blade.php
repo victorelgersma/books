@@ -95,14 +95,33 @@
                     @endif
                     <div class="mt-3 space-y-2">
                         @foreach ($note->quotes as $quote)
-                            <div class="bk-quote">
-                                “{{ $quote->text }}”
-                                <div class="bk-quote-author">
-                                    — {{ $quote->quote_author ?: $book->author }}
-                                    @if ($quote->notes->count() > 1)
-                                        <span class="bk-badge ml-1">{{ __('in :n notes', ['n' => $quote->notes->count()]) }}</span>
-                                    @endif
-                                </div>
+                            <div class="bk-quote" x-data="{ editing: false }">
+                                <template x-if="!editing">
+                                    <div>
+                                        <div class="flex items-start justify-between gap-2">
+                                            <span>“{{ $quote->text }}”</span>
+                                            <button type="button" @click="editing = true" class="text-xs underline shrink-0" style="color: var(--ink-soft); font-style: normal;">{{ __('Edit') }}</button>
+                                        </div>
+                                        <div class="bk-quote-author">
+                                            — {{ $quote->quote_author ?: $book->author }}
+                                            @if ($quote->notes->count() > 1)
+                                                <span class="bk-badge ml-1">{{ __('in :n notes', ['n' => $quote->notes->count()]) }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </template>
+                                <template x-if="editing">
+                                    <form method="POST" action="{{ route('quotes.update', $quote) }}" class="space-y-2" style="font-style: normal;">
+                                        @csrf
+                                        @method('PATCH')
+                                        <textarea name="text" required rows="2" class="bk-input" style="resize: vertical;">{{ $quote->text }}</textarea>
+                                        <input type="text" name="quote_author" value="{{ $quote->quote_author }}" maxlength="255" placeholder="{{ __('Quote author (if different from book author)') }}" class="bk-input">
+                                        <div class="flex justify-end gap-2">
+                                            <button type="button" @click="editing = false" class="bk-btn bk-btn-ghost">{{ __('Cancel') }}</button>
+                                            <button type="submit" class="bk-btn bk-btn-solid">{{ __('Save') }}</button>
+                                        </div>
+                                    </form>
+                                </template>
                             </div>
                         @endforeach
                     </div>
@@ -118,18 +137,37 @@
 
         @if ($groups['otherQuotes']->isNotEmpty())
             <h2 class="text-xs font-semibold uppercase tracking-wide mt-8 mb-2" style="color: var(--ink-soft);">{{ __('Other quotes') }}</h2>
+
             @foreach ($groups['otherQuotes'] as $quote)
-                <div class="bk-card">
-                    <div class="bk-quote">
-                        “{{ $quote->text }}”
-                        <div class="bk-quote-author">— {{ $quote->quote_author ?: $book->author }}</div>
-                    </div>
-                    <div class="flex justify-end mt-2">
-                        <form method="POST" action="{{ route('quotes.destroy', $quote) }}">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-xs" style="color: var(--ink-soft);">{{ __('Delete quote') }}</button>
+                <div class="bk-card" x-data="{ editing: false }">
+                    <template x-if="!editing">
+                        <div>
+                            <div class="bk-quote">
+                                “{{ $quote->text }}”
+                                <div class="bk-quote-author">— {{ $quote->quote_author ?: $book->author }}</div>
+                            </div>
+                            <div class="flex justify-end gap-3 mt-2">
+                                <button type="button" @click="editing = true" class="text-xs underline" style="color: var(--ink-soft);">{{ __('Edit') }}</button>
+                                <form method="POST" action="{{ route('quotes.destroy', $quote) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-xs" style="color: var(--ink-soft);">{{ __('Delete quote') }}</button>
+                                </form>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="editing">
+                        <form method="POST" action="{{ route('quotes.update', $quote) }}" class="space-y-2">
+                            @csrf
+                            @method('PATCH')
+                            <textarea name="text" required rows="2" class="bk-input" style="resize: vertical;">{{ $quote->text }}</textarea>
+                            <input type="text" name="quote_author" value="{{ $quote->quote_author }}" maxlength="255" placeholder="{{ __('Quote author (if different from book author)') }}" class="bk-input">
+                            <div class="flex justify-end gap-2">
+                                <button type="button" @click="editing = false" class="bk-btn bk-btn-ghost">{{ __('Cancel') }}</button>
+                                <button type="submit" class="bk-btn bk-btn-solid">{{ __('Save') }}</button>
+                            </div>
                         </form>
-                    </div>
+                    </template>
                 </div>
             @endforeach
         @endif
