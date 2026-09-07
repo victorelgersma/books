@@ -32,7 +32,9 @@
         </form>
 
         @forelse ($books as $book)
-            <a href="{{ route('books.show', $book) }}" class="bk-card block hover:opacity-80">
+            <div class="bk-card block hover:opacity-80" 
+                x-data
+                @click="window.location = '{{route('books.show', $book) }}'">
                 <div class="flex items-baseline justify-between gap-2">
                     <span class="font-semibold" style="color: var(--ink);">{{ $book->title }}</span>
                     @if ($book->year_read)
@@ -48,7 +50,7 @@
                         · <a href="{{ $book->url }}" target="_blank" rel="noopener" class="underline" onclick="event.stopPropagation()">{{ __('Link') }}</a>
                     @endif
                 </div>
-            </a>
+            </div>
         @empty
             <p class="text-sm py-6" style="color: var(--ink-soft);">{{ __('No books yet, add your first one above.') }}</p>
         @endforelse
