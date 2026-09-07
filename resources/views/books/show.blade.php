@@ -1,0 +1,128 @@
+<x-app-layout :book="$book">
+    <div class="max-w-2xl mx-auto px-6 sm:px-10 py-10">
+        <div class="flex items-center justify-between gap-4 mb-1">
+            <h1 class="text-2xl font-semibold truncate" style="color: var(--ink);">{{ $book->title }}</h1>
+            <form method="POST" action="{{ route('books.destroy', $book) }}"
+                onsubmit="return confirm('{{ __('Delete this book and everything under it?') }}')">
+                @csrf @method('DELETE')
+                <button type="submit" class="text-xs" style="color: var(--ink-soft);"
+                    onmouseover="this.style.color='var(--error-red)'" onmouseout="this.style.color='var(--ink-soft)'">
+                    {{ __('Delete book') }}
+                </button>
+            </form>
+        </div>
+        <p class="text-sm mb-8" style="color: var(--ink-soft);">
+            {{ $book->author }}
+            @if ($book->year_published) · {{ __('published') }} {{ $book->year_published }} @endif
+            @if ($book->year_read)
+                · {{ __('read') }} {{ $book->month_read ? \Carbon\Carbon::create()->month($book->month_read)->format('F') : '' }} {{ $book->year_read }}
+            @endif
+        </p>
+
+        <form method="POST" action="{{ route('quotes.store', $book) }}" class="bk-card" x-data="{ open: false }">
+            @csrf
+            <template x-if="!open">
+                <button type="button" @click="open = true" class="bk-btn bk-btn-ghost">+ {{ __('Add a quote') }}</button>
+            </template>
+            <template x-if="open">
+                <div class="space-y-2">
+                    <textarea name="text" required rows="2" placeholder="{{ __('Quote text') }}" class="bk-input" style="resize: vertical;"></textarea>
+                    <input type="text" name="quote_author" maxlength="255" placeholder="{{ __('Quote author (if different from book author)') }}" class="bk-input">
+                    <div class="flex justify-end gap-2">
+                        <button type="button" @click="open = false" class="bk-btn bk-btn-ghost">{{ __('Cancel') }}</button>
+                        <button type="submit" class="bk-btn bk-btn-solid">{{ __('Add quote') }}</button>
+                    </div>
+                </div>
+            </template>
+        </form>
+
+        <form method="POST" action="{{ route('notes.store') }}" class="bk-card" x-data="{ open: false }">
+            @csrf
+            <input type="hidden" name="book_id" value="{{ $book->id }}">
+            <template x-if="!open">
+                <button type="button" @click="open = true" class="bk-btn bk-btn-ghost">+ {{ __('Add a note') }}</button>
+            </template>
+            <template x-if="open">
+                <div class="space-y-2">
+                    <textarea name="body" required rows="2" placeholder="{{ __('Note') }}" class="bk-input" style="resize: vertical;"></textarea>
+                    <input type="url" name="link" maxlength="2048" placeholder="{{ __('Link (optional)') }}" class="bk-input">
+                    <div class="flex justify-end gap-2">
+                        <button type="button" @click="open = false" class="bk-btn bk-btn-ghost">{{ __('Cancel') }}</button>
+                        <button type="submit" class="bk-btn bk-btn-solid">{{ __('Add note') }}</button>
+                    </div>
+                </div>
+            </template>
+        </form>
+
+        @if ($groups['linkedNotes']->isNotEmpty())
+            <h2 class="text-xs font-semibold uppercase tracking-wide mt-8 mb-2" style="color: var(--ink-soft);">{{ __('Notes & their quotes') }}</h2>
+            @foreach ($groups['linkedNotes'] as $note)
+                <div class="bk-card">
+                    <p class="bk-note-body">{{ $note->body }}</p>
+                    @if ($note->link)
+                        <a href="{{ $note->link }}" target="_blank" rel="noopener" class="text-xs underline" style="color: var(--ink-soft);">{{ $note->link }}</a>
+                    @endif
+                    <div class="mt-3 space-y-2">
+                        @foreach ($note->quotes as $quote)
+                            <div class="bk-quote">
+                                “{{ $quote->text }}”
+                                <div class="bk-quote-author">
+                                    — {{ $quote->quote_author ?: $book->author }}
+                                    @if ($quote->notes->count() > 1)
+                                        <span class="bk-badge ml-1">{{ __('in :n notes', ['n' => $quote->notes->count()]) }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="flex justify-end mt-2">
+                        <form method="POST" action="{{ route('notes.destroy', $note) }}">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-xs" style="color: var(--ink-soft);">{{ __('Delete note') }}</button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+        @endif
+
+        @if ($groups['otherQuotes']->isNotEmpty())
+            <h2 class="text-xs font-semibold uppercase tracking-wide mt-8 mb-2" style="color: var(--ink-soft);">{{ __('Other quotes') }}</h2>
+            @foreach ($groups['otherQuotes'] as $quote)
+                <div class="bk-card">
+                    <div class="bk-quote">
+                        “{{ $quote->text }}”
+                        <div class="bk-quote-author">— {{ $quote->quote_author ?: $book->author }}</div>
+                    </div>
+                    <div class="flex justify-end mt-2">
+                        <form method="POST" action="{{ route('quotes.destroy', $quote) }}">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-xs" style="color: var(--ink-soft);">{{ __('Delete quote') }}</button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+        @endif
+
+        @if ($groups['otherNotes']->isNotEmpty())
+            <h2 class="text-xs font-semibold uppercase tracking-wide mt-8 mb-2" style="color: var(--ink-soft);">{{ __('Other notes') }}</h2>
+            @foreach ($groups['otherNotes'] as $note)
+                <div class="bk-card">
+                    <p class="bk-note-body">{{ $note->body }}</p>
+                    @if ($note->link)
+                        <a href="{{ $note->link }}" target="_blank" rel="noopener" class="text-xs underline" style="color: var(--ink-soft);">{{ $note->link }}</a>
+                    @endif
+                    <div class="flex justify-end mt-2">
+                        <form method="POST" action="{{ route('notes.destroy', $note) }}">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-xs" style="color: var(--ink-soft);">{{ __('Delete note') }}</button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+        @endif
+
+        @if ($groups['linkedNotes']->isEmpty() && $groups['otherQuotes']->isEmpty() && $groups['otherNotes']->isEmpty())
+            <p class="text-sm py-6" style="color: var(--ink-soft);">{{ __('Nothing added yet — start with a quote or a note above.') }}</p>
+        @endif
+    </div>
+</x-app-layout>
