@@ -22,32 +22,40 @@ class NoteController extends Controller
             'book_id' => ['nullable', 'exists:books,id'],
             'body' => ['required', 'string'],
             'link' => ['nullable', 'url', 'max:2048'],
+            'quote_id' => ['nullable', 'exists:quotes,id'],
         ]);
 
-                $note = Note::create($validated);
+        $note = Note::create([
+            'book_id' => $validated['book_id'] ?? null,
+            'body' => $validated['body'],
+            'link' => $validated['link'] ?? null,
+        ]);
 
-                return redirect($note->book_id ? route('books.show', $note->book_id) : route('notes.index'));
-                    }
+        if (! empty($validated['quote_id'])) {
+            $note->quotes()->attach($validated['quote_id']);
+        }
 
-        public function update(Request $request, Note $note): RedirectResponse
-                {
-                            $validated = $request->validate([
-                                            'book_id' => ['nullable', 'exists:books,id'],
-                                                        'body' => ['required', 'string'],
-                                                                    'link' => ['nullable', 'url', 'max:2048'],
-                                                                            ]);
-
-                                    $note->update($validated);
-
-                                    return redirect($note->book_id ? route('books.show', $note->book_id) : route('notes.index'));
-                                        }
-
-        public function destroy(Note $note): RedirectResponse
-                {
-                            $bookId = $note->book_id;
-                                    $note->delete();
-
-                                    return redirect($bookId ? route('books.show', $bookId) : route('notes.index'));
-                                        }
+        return redirect($note->book_id ? route('books.show', $note->book_id) : route('notes.index'));
     }
 
+    public function update(Request $request, Note $note): RedirectResponse
+    {
+        $validated = $request->validate([
+            'book_id' => ['nullable', 'exists:books,id'],
+            'body' => ['required', 'string'],
+            'link' => ['nullable', 'url', 'max:2048'],
+        ]);
+
+        $note->update($validated);
+
+        return redirect($note->book_id ? route('books.show', $note->book_id) : route('notes.index'));
+    }
+
+    public function destroy(Note $note): RedirectResponse
+    {
+        $bookId = $note->book_id;
+        $note->delete();
+
+        return redirect($bookId ? route('books.show', $bookId) : route('notes.index'));
+    }
+}

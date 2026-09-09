@@ -19,13 +19,15 @@ class BookController extends Controller
         return view('books.index', ['books' => $books]);
     }
 
-    public function show(Book $book): View
-    {
-        return view('books.show', [
-            'book' => $book,
-            'groups' => $book->groupedNotesAndQuotes(),
-        ]);
-    }
+
+public function show(Book $book): View
+{
+    return view('books.show', [
+        'book' => $book,
+        'quotes' => $book->quotes()->with('notes')->latest()->get(),
+        'unattachedNotes' => $book->notes()->whereDoesntHave('quotes')->latest()->get(),
+    ]);
+}
 
         public function store(Request $request): RedirectResponse
                 {
