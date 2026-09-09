@@ -11,8 +11,15 @@ class Book extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'author', 'url', 'year_published', 'year_read', 'month_read',
+        'title', 'author', 'url', 'want_to_read', 'year_published', 'year_read', 'month_read',
     ];
+
+	protected function casts(): array
+	{
+		return [
+			'want_to_read' => 'boolean',
+		];
+	}
 
     public function quotes(): HasMany
     {
@@ -23,6 +30,7 @@ class Book extends Model
     {
         return $this->hasMany(Note::class);
     }
+	
 
     /**
      * Linked note/quote pairs bundled together; unlinked ones flat.

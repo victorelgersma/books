@@ -1,3 +1,5 @@
+
+
 <x-app-layout :book="$book">
     <div class="max-w-2xl mx-auto px-6 sm:px-10 py-10">
         <div class="flex items-center justify-between gap-4 mb-1">
@@ -25,6 +27,9 @@
                         @if ($book->url)
                             · <a href="{{ $book->url }}" target="_blank" rel="noopener" class="underline">{{ __('Link') }}</a>
                         @endif
+                        @if ($book->want_to_read)
+                            · <span class="bk-badge">{{ __('Want to read') }}</span>
+                        @endif
                     </p>
                     <button type="button" @click="editing = true" class="text-xs underline shrink-0" style="color: var(--ink-soft);">{{ __('Edit') }}</button>
                 </div>
@@ -36,8 +41,12 @@
                     <input type="text" name="title" value="{{ $book->title }}" required maxlength="255" placeholder="{{ __('Title') }}" class="bk-input">
                     <input type="text" name="author" value="{{ $book->author }}" required maxlength="255" placeholder="{{ __('Author') }}" class="bk-input">
 
-
                     <input type="url" name="url" value="{{ $book->url }}" maxlength="2048" placeholder="{{ __('Link (optional) — Goodreads, publisher page, etc.') }}" class="bk-input">
+                    <label class="flex items-center gap-2 text-sm" style="color: var(--ink-soft);">
+                        <input type="checkbox" name="want_to_read" value="1" class="rounded" {{ $book->want_to_read ? 'checked' : '' }}>
+                        {{ __('Want to read') }}
+                    </label>
+
                     <div class="flex gap-2">
                         <input type="number" name="year_published" value="{{ $book->year_published }}" placeholder="{{ __('Year published') }}" class="bk-input">
                         <input type="number" name="year_read" value="{{ $book->year_read }}" placeholder="{{ __('Year read') }}" class="bk-input">

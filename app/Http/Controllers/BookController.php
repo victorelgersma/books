@@ -49,17 +49,20 @@ class BookController extends Controller
                                 }
 
 
+
 protected function validated(Request $request): array
 {
+    $request->merge(['want_to_read' => $request->boolean('want_to_read')]);
+
     return $request->validate([
         'title' => ['required', 'string', 'max:255'],
         'author' => ['required', 'string', 'max:255'],
         'url' => ['nullable', 'url', 'max:2048'],
+        'want_to_read' => ['required', 'boolean'],
         'year_published' => ['nullable', 'integer', 'min:1000', 'max:2100'],
         'year_read' => ['nullable', 'integer', 'min:1000', 'max:2100'],
         'month_read' => ['nullable', 'integer', 'min:1', 'max:12'],
     ]);
 }
-
     }
 
