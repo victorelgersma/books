@@ -26,11 +26,21 @@ class Book extends Model
         return $this->hasMany(Chapter::class);
     }
 
+    /**
+     * All quotes on this book, including ones scoped to a chapter.
+     * Callers that want only the book's top-level quotes must add
+     * ->whereNull('chapter_id') themselves.
+     */
     public function quotes(): HasMany
     {
         return $this->hasMany(Quote::class);
     }
 
+    /**
+     * All notes on this book, including ones scoped to a chapter.
+     * Callers that want only the book's top-level notes must add
+     * ->whereNull('chapter_id') themselves.
+     */
     public function notes(): HasMany
     {
         return $this->hasMany(Note::class);

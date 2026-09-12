@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('quotes', function (Blueprint $table) {
-            $table->foreignId('chapter_id')->nullable()->after('book_id')->constrained()->nullOnDelete();
+            $table->foreignId('chapter_id')->nullable()->after('book_id')->constrained()->cascadeOnDelete();
         });
     }
 
