@@ -5,6 +5,7 @@ use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NoteQuoteLinkController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\TermController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
