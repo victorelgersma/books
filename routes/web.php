@@ -37,4 +37,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/notes/{note}/quotes/{quote}', [NoteQuoteLinkController::class, 'destroy'])->name('note-quote-links.destroy');
 });
 
+Route::post('/books/{book}/terms', [TermController::class, 'store'])->name('terms.store');
+Route::post('/chapters/{chapter}/terms', [TermController::class, 'storeForChapter'])->name('chapters.terms.store');
+Route::patch('/terms/{term}', [TermController::class, 'update'])->name('terms.update');
+Route::delete('/terms/{term}', [TermController::class, 'destroy'])->name('terms.destroy');
+
 require __DIR__.'/auth.php';

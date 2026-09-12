@@ -37,6 +37,16 @@ class Book extends Model
     }
 
     /**
+     * All terms defined on this book, including ones scoped to a chapter.
+     * Callers that want only the book's top-level terms must add
+     * ->whereNull('chapter_id') themselves.
+     */
+    public function terms(): HasMany
+    {
+        return $this->hasMany(Term::class);
+    }
+
+    /**
      * All notes on this book, including ones scoped to a chapter.
      * Callers that want only the book's top-level notes must add
      * ->whereNull('chapter_id') themselves.

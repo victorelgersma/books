@@ -23,6 +23,12 @@ class Chapter extends Model
         return $this->hasMany(Quote::class);
     }
 
+        // app/Models/Chapter.php — add inside the class
+    public function terms(): HasMany
+    {
+        return $this->hasMany(Term::class);
+    }
+
     public function notes(): HasMany
     {
         return $this->hasMany(Note::class);

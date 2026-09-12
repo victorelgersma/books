@@ -81,6 +81,31 @@
                         @endforeach
         @endif
 
+        <form method="POST" action="{{ route('chapters.terms.store', $chapter) }}" class="bk-card" x-data="{ open: false }">
+    @csrf
+    <template x-if="!open">
+        <button type="button" @click="open = true" class="bk-btn bk-btn-ghost">+ {{ __('Add a term') }}</button>
+    </template>
+    <template x-if="open">
+        <div class="space-y-2">
+            <input type="text" name="term" required maxlength="255" placeholder="{{ __('Term') }}" class="bk-input">
+            <textarea name="definition" required rows="3" placeholder="{{ __('How this author uses the term') }}" class="bk-input" style="resize: vertical;"></textarea>
+            <div class="flex justify-end gap-2">
+                <button type="button" @click="open = false" class="bk-btn bk-btn-ghost">{{ __('Cancel') }}</button>
+                <button type="submit" class="bk-btn bk-btn-solid">{{ __('Add term') }}</button>
+            </div>
+        </div>
+    </template>
+</form>
+
+@if ($terms->isNotEmpty())
+    <h2 class="text-xs font-semibold uppercase tracking-wide mt-8 mb-2" style="color: var(--ink-soft);">{{ __('Terms') }}</h2>
+    @foreach ($terms as $term)
+        <x-term-card :term="$term" :book="$book" :chapter="$chapter" />
+    @endforeach
+@endif
+
+
         @if ($unattachedNotes->isNotEmpty())
             <h2 class="text-xs font-semibold uppercase tracking-wide mt-8 mb-2" style="color: var(--ink-soft);">{{ __('Notes') }}</h2>
             @foreach ($unattachedNotes as $note)

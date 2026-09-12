@@ -29,6 +29,7 @@ class ChapterController extends Controller
             'book' => $chapter->book,
             'quotes' => $chapter->quotes()->with('notes')->latest()->get(),
             'unattachedNotes' => $chapter->notes()->whereDoesntHave('quotes')->latest()->get(),
+            'terms' => $chapter->terms()->latest()->get(),
         ]);
     }
 

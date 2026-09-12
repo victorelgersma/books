@@ -26,6 +26,7 @@ class BookController extends Controller
             'chapters' => $book->chapters()->orderBy('chapter_number')->orderBy('title')->get(),
             'quotes' => $book->quotes()->whereNull('chapter_id')->with('notes')->latest()->get(),
             'unattachedNotes' => $book->notes()->whereNull('chapter_id')->whereDoesntHave('quotes')->latest()->get(),
+            'terms' => $book->terms()->whereNull('chapter_id')->latest()->get(),
         ]);
     }
 
