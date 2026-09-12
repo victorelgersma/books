@@ -11,11 +11,16 @@ class Quote extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['book_id', 'text', 'quote_author'];
+    protected $fillable = ['book_id', 'chapter_id', 'text', 'quote_author'];
 
     public function book(): BelongsTo
     {
         return $this->belongsTo(Book::class);
+    }
+
+    public function chapter(): BelongsTo
+    {
+        return $this->belongsTo(Chapter::class);
     }
 
     public function notes(): BelongsToMany
@@ -23,4 +28,3 @@ class Quote extends Model
         return $this->belongsToMany(Note::class);
     }
 }
-

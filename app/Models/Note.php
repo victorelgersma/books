@@ -11,11 +11,16 @@ class Note extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['book_id', 'body', 'link'];
+    protected $fillable = ['book_id', 'chapter_id', 'body', 'link'];
 
     public function book(): BelongsTo
     {
         return $this->belongsTo(Book::class);
+    }
+
+    public function chapter(): BelongsTo
+    {
+        return $this->belongsTo(Chapter::class);
     }
 
     public function quotes(): BelongsToMany
@@ -23,4 +28,3 @@ class Note extends Model
         return $this->belongsToMany(Quote::class);
     }
 }
-

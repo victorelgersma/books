@@ -1,60 +1,35 @@
 <x-app-layout :book="$book">
     <div class="max-w-2xl mx-auto px-6 sm:px-10 py-10">
         <div class="flex items-center justify-between gap-4 mb-1">
-            <h1 class="text-2xl font-semibold truncate" style="color: var(--ink);">{{ $book->title }}</h1>
-            <form method="POST" action="{{ route('books.destroy', $book) }}"
-                onsubmit="return confirm('{{ __('Delete this book and everything under it?') }}')">
+            <div>
+                <a href="{{ route('books.show', $book) }}" class="text-xs underline" style="color: var(--ink-soft);">{{ $book->title }}</a>
+                <h1 class="text-2xl font-semibold truncate" style="color: var(--ink);">
+                    @if ($chapter->chapter_number) {{ $chapter->chapter_number }}. @endif
+                    {{ $chapter->title }}
+                </h1>
+            </div>
+            <form method="POST" action="{{ route('chapters.destroy', $chapter) }}"
+                onsubmit="return confirm('{{ __('Delete this chapter and everything under it?') }}')">
                 @csrf @method('DELETE')
                 <button type="submit" class="text-xs" style="color: var(--ink-soft);"
                     onmouseover="this.style.color='var(--error-red)'" onmouseout="this.style.color='var(--ink-soft)'">
-                    {{ __('Delete book') }}
+                    {{ __('Delete chapter') }}
                 </button>
             </form>
         </div>
 
         <div class="bk-card" x-data="{ editing: false }">
             <template x-if="!editing">
-                <div class="flex items-center justify-between gap-2">
-
-                    <p class="text-sm" style="color: var(--ink-soft);">
-                        {{ $book->author }}
-                        @if ($book->year_published) · {{ __('published') }} {{ $book->year_published }} @endif
-                        @if ($book->year_read)
-                            · {{ __('read') }} {{ $book->month_read ? \Carbon\Carbon::create()->month($book->month_read)->format('F') : '' }} {{ $book->year_read }}
-                        @endif
-                        @if ($book->url)
-                            · <a href="{{ $book->url }}" target="_blank" rel="noopener" class="underline">{{ __('Link') }}</a>
-                        @endif
-                        @if ($book->want_to_read)
-                            · <span class="bk-badge">{{ __('Want to read') }}</span>
-                        @endif
-                    </p>
+                <div class="flex items-center justify-end">
                     <button type="button" @click="editing = true" class="text-xs underline shrink-0" style="color: var(--ink-soft);">{{ __('Edit') }}</button>
                 </div>
             </template>
             <template x-if="editing">
-                <form method="POST" action="{{ route('books.update', $book) }}" class="space-y-2">
+                <form method="POST" action="{{ route('chapters.update', $chapter) }}" class="space-y-2">
                     @csrf
                     @method('PATCH')
-                    <input type="text" name="title" value="{{ $book->title }}" required maxlength="255" placeholder="{{ __('Title') }}" class="bk-input">
-                    <input type="text" name="author" value="{{ $book->author }}" required maxlength="255" placeholder="{{ __('Author') }}" class="bk-input">
-
-                    <input type="url" name="url" value="{{ $book->url }}" maxlength="2048" placeholder="{{ __('Link (optional) — Goodreads, publisher page, etc.') }}" class="bk-input">
-                    <label class="flex items-center gap-2 text-sm" style="color: var(--ink-soft);">
-                        <input type="checkbox" name="want_to_read" value="1" class="rounded" {{ $book->want_to_read ? 'checked' : '' }}>
-                        {{ __('Want to read') }}
-                    </label>
-
-                    <div class="flex gap-2">
-                        <input type="number" name="year_published" value="{{ $book->year_published }}" placeholder="{{ __('Year published') }}" class="bk-input">
-                        <input type="number" name="year_read" value="{{ $book->year_read }}" placeholder="{{ __('Year read') }}" class="bk-input">
-                        <select name="month_read" class="bk-input">
-                            <option value="">{{ __('Month read') }}</option>
-                            @foreach (range(1, 12) as $m)
-                                <option value="{{ $m }}" {{ $book->month_read == $m ? 'selected' : '' }}>{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <input type="text" name="title" value="{{ $chapter->title }}" required maxlength="255" placeholder="{{ __('Chapter title') }}" class="bk-input">
+                    <input type="number" name="chapter_number" value="{{ $chapter->chapter_number }}" min="1" max="9999" placeholder="{{ __('Chapter number (optional)') }}" class="bk-input">
                     <div class="flex justify-end gap-2">
                         <button type="button" @click="editing = false" class="bk-btn bk-btn-ghost">{{ __('Cancel') }}</button>
                         <button type="submit" class="bk-btn bk-btn-solid">{{ __('Save') }}</button>
@@ -63,36 +38,7 @@
             </template>
         </div>
 
-        <div class="bk-card" x-data="{ open: false }">
-            <div class="flex items-center justify-between mb-1">
-                <h2 class="text-xs font-semibold uppercase tracking-wide" style="color: var(--ink-soft);">{{ __('Chapters') }}</h2>
-                <button type="button" @click="open = !open" class="text-xs underline" style="color: var(--ink-soft);" x-text="open ? '{{ __('Cancel') }}' : '+ {{ __('Add') }}'"></button>
-            </div>
-
-            <template x-if="open">
-                <form method="POST" action="{{ route('chapters.store', $book) }}" class="space-y-2 mb-3">
-                    @csrf
-                    <input type="text" name="title" required maxlength="255" placeholder="{{ __('Chapter title') }}" class="bk-input">
-                    <input type="number" name="chapter_number" min="1" max="9999" placeholder="{{ __('Chapter number (optional)') }}" class="bk-input">
-                    <div class="flex justify-end">
-                        <button type="submit" class="bk-btn bk-btn-solid">{{ __('Add chapter') }}</button>
-                    </div>
-                </form>
-            </template>
-
-            @forelse ($chapters as $chapter)
-                <a href="{{ route('chapters.show', $chapter) }}" class="bk-sidebar-link" style="padding-left: 0; padding-right: 0;">
-                    <span>
-                        @if ($chapter->chapter_number) {{ $chapter->chapter_number }}. @endif
-                        {{ $chapter->title }}
-                    </span>
-                </a>
-            @empty
-                <p class="text-sm" style="color: var(--ink-soft);">{{ __('No chapters yet.') }}</p>
-            @endforelse
-        </div>
-
-        <form method="POST" action="{{ route('quotes.store', $book) }}" class="bk-card" x-data="{ open: false }">
+        <form method="POST" action="{{ route('chapters.quotes.store', $chapter) }}" class="bk-card" x-data="{ open: false }">
             @csrf
             <template x-if="!open">
                 <button type="button" @click="open = true" class="bk-btn bk-btn-ghost">+ {{ __('Add a quote') }}</button>
@@ -112,6 +58,7 @@
         <form method="POST" action="{{ route('notes.store') }}" class="bk-card" x-data="{ open: false }">
             @csrf
             <input type="hidden" name="book_id" value="{{ $book->id }}">
+            <input type="hidden" name="chapter_id" value="{{ $chapter->id }}">
             <template x-if="!open">
                 <button type="button" @click="open = true" class="bk-btn bk-btn-ghost">+ {{ __('Add a note') }}</button>
             </template>
@@ -162,6 +109,7 @@
                                                     @csrf
                                                     @method('PATCH')
                                                     <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                                    <input type="hidden" name="chapter_id" value="{{ $chapter->id }}">
                                                     <textarea name="body" required rows="2" class="bk-input" style="resize: vertical;">{{ $comment->body }}</textarea>
                                                     <input type="url" name="link" value="{{ $comment->link }}" maxlength="2048" placeholder="{{ __('Link (optional)') }}" class="bk-input">
                                                     <div class="flex justify-end gap-2">
@@ -181,6 +129,7 @@
                                     <form method="POST" action="{{ route('notes.store') }}" class="space-y-2 mt-2">
                                         @csrf
                                         <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                        <input type="hidden" name="chapter_id" value="{{ $chapter->id }}">
                                         <input type="hidden" name="quote_id" value="{{ $quote->id }}">
                                         <textarea name="body" required rows="2" placeholder="{{ __('Comment') }}" class="bk-input" style="resize: vertical;"></textarea>
                                         <div class="flex justify-end gap-2">
@@ -241,7 +190,8 @@
                         <form method="POST" action="{{ route('notes.update', $note) }}" class="space-y-2">
                             @csrf
                             @method('PATCH')
-                            <input type="hidden" name="book_id" value="{{ $note->book_id }}">
+                            <input type="hidden" name="book_id" value="{{ $book->id }}">
+                            <input type="hidden" name="chapter_id" value="{{ $chapter->id }}">
                             <textarea name="body" required rows="2" class="bk-input" style="resize: vertical;">{{ $note->body }}</textarea>
                             <input type="url" name="link" value="{{ $note->link }}" maxlength="2048" placeholder="{{ __('Link (optional)') }}" class="bk-input">
                             <div class="flex justify-end gap-2">

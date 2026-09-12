@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NoteQuoteLinkController;
 use App\Http\Controllers\QuoteController;
@@ -17,7 +18,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/books/{book}', [BookController::class, 'update'])->name('books.update');
     Route::delete('/books/{book}', [BookController::class, 'destroy'])->name('books.destroy');
 
+    Route::post('/books/{book}/chapters', [ChapterController::class, 'store'])->name('chapters.store');
+    Route::get('/chapters/{chapter}', [ChapterController::class, 'show'])->name('chapters.show');
+    Route::patch('/chapters/{chapter}', [ChapterController::class, 'update'])->name('chapters.update');
+    Route::delete('/chapters/{chapter}', [ChapterController::class, 'destroy'])->name('chapters.destroy');
+
     Route::post('/books/{book}/quotes', [QuoteController::class, 'store'])->name('quotes.store');
+    Route::post('/chapters/{chapter}/quotes', [QuoteController::class, 'storeForChapter'])->name('chapters.quotes.store');
     Route::patch('/quotes/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
     Route::delete('/quotes/{quote}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
 
@@ -31,4 +38,3 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-

@@ -4,26 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Book extends Model
+class Chapter extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'title', 'author', 'url', 'want_to_read', 'year_published', 'year_read', 'month_read',
-    ];
+    protected $fillable = ['book_id', 'title', 'chapter_number'];
 
-    protected function casts(): array
+    public function book(): BelongsTo
     {
-        return [
-            'want_to_read' => 'boolean',
-        ];
-    }
-
-    public function chapters(): HasMany
-    {
-        return $this->hasMany(Chapter::class);
+        return $this->belongsTo(Book::class);
     }
 
     public function quotes(): HasMany
